@@ -1,0 +1,2 @@
+Contributor License Agreement (CLA)
+By contributing to this repository, you agree that your contributions may be relicensed under the project's Commercial License at the sole discretion of the project maintainers.

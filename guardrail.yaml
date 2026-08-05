@@ -1,0 +1,52 @@
+# Agent Cybersecurity Guardrails Configuration
+# ========================================
+
+# Whitelist: trusted executables that are allowed to run
+whitelist:
+  - path: "/usr/bin/docker"
+    sha256: ""
+    allowed_args: []
+    allowed_ports: [2375, 2376]
+  - path: "/usr/bin/ssh"
+    sha256: ""
+    allowed_args: []
+    allowed_ports: [22]
+  - path: "/usr/bin/curl"
+    sha256: ""
+    allowed_args: []
+    allowed_ports: [80, 443]
+
+# Blacklist: executables and arguments that are never allowed
+blacklist:
+  executables:
+    - "/tmp/*"
+    - "/dev/shm/*"
+    - "/var/tmp/*"
+  args:
+    - "-e"
+    - "sh -c"
+    - "/bin/sh -i"
+
+# Network: network connection policies
+network:
+  allowed_domains:
+    - "*.internal.com"
+    - "*.company.net"
+  blocklist_ips:
+    - "10.66.66.0/24"
+  max_connections_per_minute: 100
+
+# Behaviour: thresholds for anomaly detection
+behaviour:
+  cpu_threshold: 80.0
+  memory_threshold: 2048.0
+  scan_ips_threshold: 100
+  sustained_cpu_percent: 70.0
+  max_child_processes: 50
+  max_network_connections: 200
+
+# Response: how to respond to threats
+response:
+  action: "kill"
+  alert_endpoint: ""
+  grace_period: "0s"

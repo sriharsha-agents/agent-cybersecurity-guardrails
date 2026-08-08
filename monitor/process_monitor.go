@@ -177,15 +177,13 @@ func (pm *ProcessMonitor) readProcessInfo(pid int) (ProcessInfo, error) {
 	statusPath := fmt.Sprintf("/proc/%d/status", pid)
 	if data, err := os.ReadFile(statusPath); err == nil {
 		for _, line := range splitLines(string(data)) {
-			if len(line) >= 6 {
-				switch {
-				case line[:5] == "PPid:":
-					fmt.Sscanf(line[5:], "%d", &info.PPID)
-				case line[:7] == "VmRSS:":
-					var rssKB int64
-					fmt.Sscanf(line[7:], "%d", &rssKB)
-					info.MemoryRSS = uint64(rssKB * 1024)
-				}
+			switch {
+			case len(line) >= 7 && line[:7] == "VmRSS:":
+				var rssKB int64
+				fmt.Sscanf(line[7:], "%d", &rssKB)
+				info.MemoryRSS = uint64(rssKB * 1024)
+			case len(line) >= 5 && line[:5] == "PPid:":
+				fmt.Sscanf(line[5:], "%d", &info.PPID)
 			}
 		}
 	}

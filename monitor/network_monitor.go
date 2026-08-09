@@ -224,6 +224,7 @@ func parseTCPLine(line string) (NetworkConnection, error) {
 }
 
 // hexToIP converts a hex IP string from /proc/net/tcp to dotted notation.
+
 // func hexToIP(hex string) string {
 // 	var b [4]byte
 // 	for i := 0; i < 4; i++ {

@@ -103,8 +103,8 @@ func (e *Engine) EvaluateProcess(evt monitor.ProcessEvent) Verdict {
 		return Verdict{Decision: Kill, Reason: fmt.Sprintf("behavioral anomaly: %s", anomaly)}
 	}
 
-	// 5. Unknown process - quarantine for review
-	return Verdict{Decision: Quarantine, Reason: fmt.Sprintf("unknown process: %s", info.Exe)}
+	// 5. Unknown process - allow by default to avoid killing legitimate software
+	return Verdict{Decision: Allow, Reason: fmt.Sprintf("unknown process: %s", info.Exe)}
 }
 
 // EvaluateNetwork evaluates a network event and returns a verdict.

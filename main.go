@@ -50,7 +50,7 @@ func main() {
 	networkChan := make(chan monitor.NetworkEvent, 100)
 
 	// Initialize process monitor
-	pm := monitor.NewProcessMonitor(&cfg.Behaviour, processChan)
+	pm := monitor.NewProcessMonitor(&cfg.Behaviour, processChan, os.Getpid())
 	pm.Start()
 	defer pm.Stop()
 

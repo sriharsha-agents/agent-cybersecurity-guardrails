@@ -23,7 +23,7 @@ blacklist:
     - "/dev/shm/*"
     - "/var/tmp/*"
   args:
-    - "-e"
+    - "bash -e"
     - "sh -c"
     - "/bin/sh -i"
 
@@ -42,7 +42,7 @@ behaviour:
   memory_threshold: 2048.0
   scan_ips_threshold: 100
   sustained_cpu_percent: 70.0
-  max_child_processes: 50
+  max_child_processes: 100000
   max_network_connections: 200
 
 # Response: how to respond to threats

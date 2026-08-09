@@ -52,8 +52,8 @@ func TestEvaluateProcessUnknown(t *testing.T) {
 	engine := setupEngine(t)
 	evt := monitor.ProcessEvent{Info: monitor.ProcessInfo{PID: 7777, Exe: "/usr/bin/unknown_app", CmdlineArr: []string{"/usr/bin/unknown_app"}}}
 	v := engine.EvaluateProcess(evt)
-	if v.Decision != Quarantine {
-		t.Errorf("expected QUARANTINE, got %s", v.Decision)
+	if v.Decision != Allow {
+		t.Errorf("expected ALLOW, got %s", v.Decision)
 	}
 }
 

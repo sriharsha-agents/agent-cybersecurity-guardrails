@@ -34,6 +34,7 @@ type ProcessEvent struct {
 // ProcessMonitor continuously scans for new processes and emits events.
 type ProcessMonitor struct {
 	cfg       *config.BehaviourConfig
+	myPID     int
 	seenPIDs  map[int]bool
 	mu        sync.Mutex
 	eventChan chan<- ProcessEvent
@@ -42,11 +43,12 @@ type ProcessMonitor struct {
 	cancel    context.CancelFunc
 }
 
-// NewProcessMonitor creates a new ProcessMonitor.
-func NewProcessMonitor(cfg *config.BehaviourConfig, eventChan chan<- ProcessEvent) *ProcessMonitor {
+// NewProcessMonitor creates a new ProcessMonitor. myPID is the daemon's own PID to skip.
+func NewProcessMonitor(cfg *config.BehaviourConfig, eventChan chan<- ProcessEvent, myPID int) *ProcessMonitor {
 	ctx, cancel := context.WithCancel(context.Background())
 	return &ProcessMonitor{
 		cfg:       cfg,
+		myPID:     myPID,
 		seenPIDs:  make(map[int]bool),
 		eventChan: eventChan,
 		ticker:    time.NewTicker(1 * time.Second),
@@ -89,6 +91,11 @@ func (pm *ProcessMonitor) scan() {
 	defer pm.mu.Unlock()
 
 	for _, p := range procs {
+		// Skip our own PID to prevent self-evaluation
+		if p.PID == pm.myPID {
+			pm.seenPIDs[p.PID] = true
+			continue
+		}
 		if pm.seenPIDs[p.PID] {
 			continue
 		}

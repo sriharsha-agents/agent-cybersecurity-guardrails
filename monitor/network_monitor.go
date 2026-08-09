@@ -224,10 +224,24 @@ func parseTCPLine(line string) (NetworkConnection, error) {
 }
 
 // hexToIP converts a hex IP string from /proc/net/tcp to dotted notation.
+// func hexToIP(hex string) string {
+// 	var b [4]byte
+// 	for i := 0; i < 4; i++ {
+// 		fmt.Sscanf(hex[i*2:i*2+2], "%02x", &b[i])
+// 	}
+// 	return fmt.Sprintf("%d.%d.%d.%d", b[0], b[1], b[2], b[3])
+// }
+
 func hexToIP(hex string) string {
+	if len(hex) != 8 {
+		return "" // or could return hex? but caller expects IP string
+	}
 	var b [4]byte
 	for i := 0; i < 4; i++ {
-		fmt.Sscanf(hex[i*2:i*2+2], "%02x", &b[i])
+		_, err := fmt.Sscanf(hex[i*2:i*2+2], "%02x", &b[i])
+		if err != nil {
+			return ""
+		}
 	}
 	return fmt.Sprintf("%d.%d.%d.%d", b[0], b[1], b[2], b[3])
 }

@@ -46,6 +46,11 @@ type ResponseConfig struct {
 	GracePeriod   time.Duration `yaml:"grace_period"`
 }
 
+// DashboardConfig defines dashboard server settings.
+type DashboardConfig struct {
+	Addr string `yaml:"addr"`
+}
+
 // Config is the top-level configuration structure.
 type Config struct {
 	Whitelist []WhitelistEntry `yaml:"whitelist"`
@@ -53,6 +58,7 @@ type Config struct {
 	Network   NetworkConfig    `yaml:"network"`
 	Behaviour BehaviourConfig  `yaml:"behaviour"`
 	Response  ResponseConfig   `yaml:"response"`
+	Dashboard DashboardConfig  `yaml:"dashboard"`
 }
 
 // Load reads and parses a YAML configuration file.
@@ -117,6 +123,9 @@ func DefaultConfig() *Config {
 			Action:        "kill",
 			AlertEndpoint: "",
 			GracePeriod:   0,
+		},
+		Dashboard: DashboardConfig{
+			Addr: ":8080",
 		},
 	}
 }

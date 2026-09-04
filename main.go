@@ -5,10 +5,12 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
 	"agent-cybersecurity-guardrails/config"
+	"agent-cybersecurity-guardrails/dashboard"
 	"agent-cybersecurity-guardrails/detector"
 	"agent-cybersecurity-guardrails/engine"
 	"agent-cybersecurity-guardrails/monitor"
@@ -45,6 +47,10 @@ func main() {
 	// Initialize response handler
 	respHandler := response.New(&cfg.Response)
 
+	// Initialize dashboard
+	dash := dashboard.NewStore()
+	dash.StartHTTP(cfg.Dashboard.Addr)
+
 	// Create event channels
 	processChan := make(chan monitor.ProcessEvent, 100)
 	networkChan := make(chan monitor.NetworkEvent, 100)
@@ -60,8 +66,8 @@ func main() {
 	defer nm.Stop()
 
 	// Start event processing goroutines
-	go processEvents(processChan, decEngine, respHandler)
-	go networkEvents(networkChan, decEngine, respHandler)
+	go processEvents(processChan, decEngine, respHandler, dash)
+	go networkEvents(networkChan, decEngine, respHandler, dash)
 
 	// Start cleanup goroutine
 	go func() {
@@ -83,9 +89,10 @@ func main() {
 }
 
 // processEvents handles process events from the monitor.
-func processEvents(ch <-chan monitor.ProcessEvent, decEngine *engine.Engine, respHandler *response.Handler) {
+func processEvents(ch <-chan monitor.ProcessEvent, decEngine *engine.Engine, respHandler *response.Handler, dash *dashboard.Store) {
 	for evt := range ch {
 		verdict := decEngine.EvaluateProcess(evt)
+		dash.Add(evt, verdict.Reason, strings.ToLower(verdict.Decision.String()))
 		if err := respHandler.Handle(evt.Info.PID, evt.Info.Exe, evt.Info.Cmdline, verdict.Reason, verdict); err != nil {
 			log.Printf("[main] handle process event: %v", err)
 		}
@@ -93,9 +100,10 @@ func processEvents(ch <-chan monitor.ProcessEvent, decEngine *engine.Engine, res
 }
 
 // networkEvents handles network events from the monitor.
-func networkEvents(ch <-chan monitor.NetworkEvent, decEngine *engine.Engine, respHandler *response.Handler) {
+func networkEvents(ch <-chan monitor.NetworkEvent, decEngine *engine.Engine, respHandler *response.Handler, dash *dashboard.Store) {
 	for evt := range ch {
 		verdict := decEngine.EvaluateNetwork(evt)
+		dash.AddNet(evt, evt.Reason, strings.ToLower(verdict.Decision.String()))
 		if err := respHandler.Handle(evt.Connection.PID, evt.Connection.RemoteAddr, "", evt.Reason, verdict); err != nil {
 			log.Printf("[main] handle network event: %v", err)
 		}

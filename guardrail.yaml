@@ -51,3 +51,7 @@ response:
   action: "kill"
   alert_endpoint: ""
   grace_period: "0s"
+
+# Dashboard: web UI for real-time event monitoring
+dashboard:
+  addr: ":8080"

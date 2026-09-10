@@ -10,6 +10,7 @@ A lightweight, high-performance Go daemon that enforces cybersecurity guardrails
 - **Blacklist Engine** – Blocks executables in dangerous directories (`/tmp`, `/dev/shm`) and suspicious arguments (`-e`, `sh -c`)
 - **Behavioral Anomaly Detection** – Detects CPU spikes, memory abuse, sustained high CPU, rapid child-process spawning, and excessive network connections
 - **Automated Response** – Kills or quarantines offending processes, optionally sends alerts to an HTTP endpoint
+- **Web Dashboard** – Real-time monitoring UI with live event feed and statistics
 - **YAML Configuration** – Simple, human-readable configuration file with sensible defaults
 
 ## Architecture
@@ -25,11 +26,17 @@ A lightweight, high-performance Go daemon that enforces cybersecurity guardrails
 │  (whitelist / blacklist / anomaly) │
 └──────────────┬───────────────────┘
             │
-            ▼
-┌────────────────────────────────┐
-│       Response Handler           │
-│  (kill / quarantine / alert)    │
-└────────────────────────────────┘
+     ┌───────┴───────┐
+     ▼            ▼
+┌──────────────┐  ┌──────────┐
+│ Response   │  │ Dashboard│
+│  Handler   │  │  Store   │
+└──────────────┘  └────┬───────┘
+                   ▼
+            ┌──────────────┐
+            │  HTTP API   │
+            │  :8080      │
+            └──────────────┘
 ```
 
 ## Prerequisites
@@ -188,14 +195,37 @@ go test ./engine/... -v
 
 ```
 .
-├── main.go                 # Daemon entry point
-├── guardrail.yaml          # Sample configuration
-├── config/                 # Configuration loader & validation
-├── whitelist/              # Trusted executable store
-├── engine/               # Decision engine (allow/kill/quarantine)
-├── detector/             # Behavioral anomaly detection
-├── monitor/              # Process & network event monitors
-└── response/             # Response handler (kill/quarantine/alert)
+├── main.go                     # Entry point
+├── guardrail.yaml             # Sample configuration
+├── go.mod / go.sum          # Module definition & dependencies
+├── config/
+│   ├── config.go            # YAML config parser
+│   └── config_test.go
+├── monitor/
+│   ├── process_monitor.go     # /proc-based process watcher
+│   ├── process_monitor_test.go
+│   ├── network_monitor.go     # Outbound connection tracker
+│   └── network_monitor_test.go
+├── whitelist/
+│   ├── store.go           # Trusted executable store
+│   └── store_test.go
+├── engine/
+│   ├── decision.go          # ALLOW / KILL / QUARANTINE logic
+│   └── decision_test.go
+├── detector/
+│   ├── anomaly.go           # CPU / memory / fork-bomb detectors
+│   └── anomaly_test.go
+├── response/
+│   ├── handler.go           # Kill / quarantine / alert dispatcher
+│   └── handler_test.go
+├── dashboard/
+│   ├── server.go          # HTTP API + web UI
+│   ├── store.go         # In-memory event store
+│   └── static/           # Frontend assets
+├── licensing/
+│   └── COMMERCIAL-LICENSE.md
+├── LICENSE                  # AGPL-3.0
+└── CLA.md                 # Contributor License Agreement
 ```
 
 ## Licensing

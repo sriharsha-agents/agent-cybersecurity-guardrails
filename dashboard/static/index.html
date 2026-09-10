@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html><head><meta charset=utf-8><title>Guardrails</title>
+<style>
+body{font-family:sans-serif;background:#111;color:#eee;padding:20px}
+h1{text-align:center;color:#0f0}
+.g{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;max-width:700px;margin:20px auto}
+.c{background:#1a1a2e;padding:16px;border-radius:8px;text-align:center}
+.v{font-size:2em;font-weight:bold}
+.ok{color:#0f0}.no{color:#f44}.qn{color:#fa0}.bl{color:#4af}
+table{max-width:700px;margin:20px auto;width:100%;border-collapse:collapse;font-size:.85em}
+td,th{padding:6px 10px;border-bottom:1px solid #333;text-align:left}
+th{color:#888}
+</style></head><body>
+<h1>Cybersecurity Guardrails</h1>
+<div class=g>
+<div class=c><div class=v id=T>0</div>Total</div>
+<div class=c><div class=v ok id=O>0</div>Allowed</div>
+<div class=c><div class=v no id=K>0</div>Killed</div>
+<div class=c><div class=v qn id=Q>0</div>Quarantined</div>
+<div class=c><div class=v bl id=P>0</div>Process</div>
+<div class=c><div class=v bl id=N>0</div>Network</div>
+</div>
+<table><tr><th>Time</th><th>Type</th><th>PID</th><th>Exe</th><th>Reason</th><th>Action</th></tr><tbody id=tb></tbody></table>
+<script src=app.js></script>
+</body></html>

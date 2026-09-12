@@ -27,6 +27,8 @@ type NetworkConfig struct {
 	AllowedDomains []string `yaml:"allowed_domains"`
 	BlocklistIPs   []string `yaml:"blocklist_ips"`
 	MaxConnections int      `yaml:"max_connections_per_minute"`
+	BlockedRegions []string `yaml:"blocked_regions"`
+	EdgeDeviceIPs  []string `yaml:"edge_device_ips"`
 }
 
 // BehaviourConfig defines thresholds for behavioral anomaly detection.

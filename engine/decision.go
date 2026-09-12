@@ -159,3 +159,23 @@ func (e *Engine) CheckArgBlacklist(args []string) (bool, string) {
 func GetProcessName(exe string) string {
 	return filepath.Base(exe)
 }
+
+// CheckRegionBlocked checks if a region is in the blocked regions list.
+func (e *Engine) CheckRegionBlocked(region string) bool {
+	for _, blocked := range e.networkCfg.BlockedRegions {
+		if strings.EqualFold(region, blocked) {
+			return true
+		}
+	}
+	return false
+}
+
+// IsEdgeDeviceIP checks if an IP is in the trusted edge device list.
+func (e *Engine) IsEdgeDeviceIP(ip string) bool {
+	for _, trustedIP := range e.networkCfg.EdgeDeviceIPs {
+		if strings.EqualFold(ip, trustedIP) {
+			return true
+		}
+	}
+	return false
+}
